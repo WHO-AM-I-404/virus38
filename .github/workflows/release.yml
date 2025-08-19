@@ -18,14 +18,14 @@ jobs:
 
     # Build x64
     - name: Configure CMake (x64)
-      run: cmake -S . -B build_x64 -A x64
+      run: cmake -S VIRUS -B build_x64 -A x64
 
     - name: Build (x64 Release)
       run: cmake --build build_x64 --config Release
 
     # Build x86
     - name: Configure CMake (x86)
-      run: cmake -S . -B build_x86 -A Win32
+      run: cmake -S VIRUS -B build_x86 -A Win32
 
     - name: Build (x86 Release)
       run: cmake --build build_x86 --config Release
