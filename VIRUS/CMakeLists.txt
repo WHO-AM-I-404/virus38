@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 3.15)
-project(VIRUS38)
+cmake_minimum_required(VERSION 3.10)
+project(virus38)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# pakai nama file yang bener sesuai repo kamu
-add_executable(virus38 virus38.cpp)
+add_executable(virus38 main.cpp)
