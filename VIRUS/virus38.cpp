@@ -253,7 +253,7 @@ void CaptureScreen(HWND) {
     
     if (hGlitchBitmap) {
         SelectObject(hdcMem, hGlitchBitmap);
-        BitBlt(hdcMem, 极0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY);
+        BitBlt(hdcMem, 0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY);
     }
     
     POINT pt;
@@ -299,7 +299,7 @@ void ApplyCursorEffect() {
                 int pos = (y * screenWidth + x) * 4;
                 if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                     pPixels[pos] = 255 - pPixels[pos];
-                    pPixels[pos + 1] = 255 - p极ixels[pos + 1];
+                    pPixels[pos + 1] = 255 - pPixels[pos + 1];
                     pPixels[pos + 2] = 255 - pPixels[pos + 2];
                     
                     if (dist < cursorSize / 2) {
@@ -331,7 +331,7 @@ void UpdateParticles() {
             Particle p;
             p.x = rand() % screenWidth;
             p.y = rand() % screenHeight;
-            p.v极x = (rand() % 600 - 300) / 20.0f;
+            p.vx = (rand() % 600 - 300) / 20.0f;
             p.vy = (rand() % 600 - 300) / 20.0f;
             p.life = 0;
             p.maxLife = 150 + rand() % 500;
@@ -371,7 +371,7 @@ void UpdateParticles() {
                                 } else {
                                     pPixels[pos] = GetBValue(it->color) / 2 + pPixels[pos] / 2;
                                     pPixels[pos + 1] = GetGValue(it->color) / 2 + pPixels[pos + 1] / 2;
-                                    pPixels[pos + 2] = GetRValue(it->color) / 2 + pPixels[pos + 2] / 2;
+                                    pPixels[pos + 2] = GetRValue(it->color) / 2 + pixels[pos + 2] / 2;
                                 }
                             }
                         }
@@ -461,7 +461,7 @@ void ApplyTextCorruption() {
         
         DeleteObject(hFont);
         
-        if (GetTickCount() - it->creationTime > it->life极) {
+        if (GetTickCount() - it->creationTime > it->life) {
             it = corruptedTexts.erase(it);
         } else {
             it->x += (rand() % 25) - 12;
@@ -563,8 +563,8 @@ void ApplyInversionWaves() {
     float speed = 0.5f + (rand() % 200) / 100.0f;
     DWORD currentTime = GetTickCount();
     
-    for (极int y = 0; y < screenHeight; y++) {
-        for (int x = 0; x < screenWidth; x++) {
+    for (int y = 0; y < screenHeight; y++) {
+        for (int x = 0; x < screenWidth;极 x++) {
             float dx = static_cast<float>(x - centerX);
             float dy = static_cast<float>(y - centerY);
             float dist = sqrt(dx*dx + dy*dy);
@@ -593,7 +593,7 @@ void ApplyDistortionEffect() {
     int yStart = std::max(centerY - radius, 0);
     int yEnd = std::min(centerY + radius, screenHeight);
     int xStart = std::max(centerX - radius, 0);
-    int x极End = std::min(centerX + radius, screenWidth);
+    int xEnd = std::min(centerX + radius, screenWidth);
     
     for (int y = yStart; y < yEnd; y++) {
         for (int x = xStart; x < xEnd; x++) {
@@ -660,7 +660,7 @@ void ApplyGlitchEffect() {
     
     DWORD cTime = GetTickCount();
     
-    int timeIntensity = 1 + static_cast<int>((c极Time - startTime) / 2000);
+    int timeIntensity = 1 + static_cast<int>((cTime - startTime) / 2000);
     intensityLevel = std::min(40, timeIntensity);
     
     ApplyScreenShake();
@@ -729,7 +729,7 @@ void ApplyGlitchEffect() {
         int x = rand() % (screenWidth - blockWidth);
         int y = rand() % (screenHeight - blockHeight);
         int offsetX = (rand() % (2000 * intensityLevel)) - 1000 * intensityLevel;
-        int offsetY = (rand() % (2000 * intensityLevel)) - 1000 * intensityLevel;
+        int offsetY = (极rand() % (2000 * intensityLevel)) - 1000 * intensityLevel;
         
         for (int h = 0; h < blockHeight; h++) {
             int sourceY = y + h;
@@ -781,9 +781,9 @@ void ApplyGlitchEffect() {
         for (int y = 0; y < screenHeight; y += lineHeight * 2) {
             for (int h = 0; h < lineHeight; h++) {
                 if (y + h >= screenHeight) break;
-                for (int x = 0; x极 < screenWidth; x++) {
+                for (int x = 0; x < screenWidth; x++) {
                     int pos = ((y + h) * screenWidth + x) * 4;
-                    if (pos >= 极0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
+                    if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                         pPixels[pos] = std::min(pPixels[pos] + 200, 255);
                         pPixels[pos + 1] = std::min(pPixels[pos + 1] + 200, 255);
                         pPixels[pos + 2] = std::min(pPixels[pos + 2] + 200, 255);
@@ -793,7 +793,7 @@ void ApplyGlitchEffect() {
         }
     }
     
-    if (intensityLevel > 0 && (rand() % std::max(1, 6 / intensityLevel)) == 0) {
+    if (intensityLevel > 0 && (rand() % std::极max(1, 6 / intensityLevel)) == 0) {
         for (int i = 0; i < static_cast<int>(screenWidth * screenHeight * 4); i += 4) {
             if (i < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                 pPixels[i] = 255 - pPixels[i];
@@ -803,7 +803,7 @@ void ApplyGlitchEffect() {
         }
     }
     
-    if (intensityLevel > 2 && rand() % 2 == 0) {
+    if (intensityLevel > 2 && rand() % 2 == 极0) {
         ApplyMeltingEffect(pCopy);
     }
     
@@ -876,7 +876,7 @@ void DrawWarningMessage(HDC hdc) {
     rect.top += 100;
     
     std::wstring subText = L"Efek visual intens akan segera dimulai...";
-    DrawTextW(hdc, subText.c_str(), -1, &rect, DT极_CENTER | DT_VCENTER | DT_SINGLELINE);
+    DrawTextW(hdc, subText.c_str(), -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
     
     DeleteObject(hFont);
     DeleteObject(hSmallFont);
@@ -908,7 +908,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 DrawWarningMessage(hdcLayered);
             }
             
-            UpdateLayeredWindow(hwnd, h极dcScreen, &ptZero, &size, hdcLayered, 
+            UpdateLayeredWindow(hwnd, hdcScreen, &ptZero, &size, hdcLayered, 
                                &ptZero, 0, &blend, ULW_ALPHA);
             
             ReleaseDC(NULL, hdcScreen);
@@ -917,7 +917,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     }
         
     case WM_DESTROY:
-        KillTimer(hwnd极, 1);
+        KillTimer(hwnd, 1);
         if (hGlitchBitmap) DeleteObject(hGlitchBitmap);
         if (hdcLayered) DeleteDC(hdcLayered);
         ShowCursor(TRUE);
@@ -1011,7 +1011,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
         L"PERINGATAN TERAKHIR!\n\n"
         L"Program ini akan menyebabkan kerusakan permanen pada sistem Anda.\n"
         L"Data Anda mungkin tidak dapat dipulihkan setelah program ini dijalankan.\n\n"
-        L"Program ini dibuat untuk tujuan edukasi dan penelitian saja.\n"
+        L"Program ini dibuat untuk tujuan edukasi and penelitian saja.\n"
         L"JANGAN jalankan pada komputer yang digunakan untuk pekerjaan atau data penting.\n\n"
         L"Apakah Anda BENAR-BENAR yakin ingin melanjutkan?",
         L"VIRUS38 - FINAL WARNING", 
