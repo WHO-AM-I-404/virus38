@@ -3,4 +3,5 @@ project(VIRUS38)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(virus32 virus32.cpp)
+# pakai nama file yang bener sesuai repo kamu
+add_executable(virus38 virus38.cpp)
