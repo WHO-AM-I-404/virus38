@@ -37,10 +37,10 @@ jobs:
         copy build_x86\Release\virus32.exe artifacts\VIRUS38_x86.exe
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: VIRUS38
-        path: artifacts\*
+        path: artifacts/*
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
