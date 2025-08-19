@@ -13,26 +13,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup MSVC (for CMake)
-      uses: ilammy/msvc-dev-cmd@v1
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
 
-    - name: Configure CMake (x64)
-      run: cmake -S VIRUS -B build_x64 -A x64
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
 
-    - name: Build (x64 Release)
-      run: cmake --build build_x64 --config Release
+    - name: Restore NuGet packages
+      run: nuget restore VIRUS38.sln
 
-    - name: Configure CMake (x86)
-      run: cmake -S VIRUS -B build_x86 -A Win32
+    - name: Build Release x64
+      run: msbuild VIRUS38.sln /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
 
-    - name: Build (x86 Release)
-      run: cmake --build build_x86 --config Release
+    - name: Build Release x86
+      run: msbuild VIRUS38.sln /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143
 
     - name: Create release artifacts
       run: |
         mkdir VIRUS38_Build
-        copy build_x64\Release\virus32.exe VIRUS38_Build\VIRUS38_x64.exe
-        copy build_x86\Release\virus32.exe VIRUS38_Build\VIRUS38_x86.exe
+        copy x64\Release\VIRUS38.exe VIRUS38_Build\VIRUS38_x64.exe
+        copy Win32\Release\VIRUS38.exe VIRUS38_Build\VIRUS38_x86.exe
         7z a VIRUS38_Build.zip VIRUS38_Build\
 
     - name: Upload artifacts
