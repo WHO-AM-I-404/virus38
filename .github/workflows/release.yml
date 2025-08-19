@@ -1,0 +1,49 @@
+name: Build VIRUS38
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+
+    - name: Restore NuGet packages
+      run: nuget restore VIRUS38.sln
+
+    - name: Build Release x64
+      run: msbuild VIRUS38.sln /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
+
+    - name: Build Release x86
+      run: msbuild VIRUS38.sln /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143
+
+    - name: Create release artifacts
+      run: |
+        mkdir VIRUS38_Build
+        copy x64\Release\VIRUS38.exe VIRUS38_Build\VIRUS38_x64.exe
+        copy Win32\Release\VIRUS38.exe VIRUS38_Build\VIRUS38_x86.exe
+        7z a VIRUS38_Build.zip VIRUS38_Build\
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: VIRUS38
+        path: VIRUS38_Build.zip
+
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: VIRUS38_Build.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
