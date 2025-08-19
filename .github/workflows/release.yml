@@ -11,24 +11,40 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+    - name: Setup MSVC (for CMake)
+      uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Restore NuGet packages
-      run: nuget restore
+    # Build x64
+    - name: Configure CMake (x64)
+      run: cmake -S VIRUS -B build_x64 -A x64
 
-    - name: Build Release
-      run: msbuild /p:Configuration=Release /p:Platform=x64
+    - name: Build (x64 Release)
+      run: cmake --build build_x64 --config Release
 
-    - name: Create Release
+    # Build x86
+    - name: Configure CMake (x86)
+      run: cmake -S VIRUS -B build_x86 -A Win32
+
+    - name: Build (x86 Release)
+      run: cmake --build build_x86 --config Release
+
+    - name: Create release artifacts
+      run: |
+        mkdir artifacts
+        copy build_x64\Release\virus32.exe artifacts\VIRUS38_x64.exe
+        copy build_x86\Release\virus32.exe artifacts\VIRUS38_x86.exe
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: VIRUS38
+        path: artifacts\*
+
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          x64/Release/VIRUS38.exe
-        tag_name: ${{ github.ref }}
-        name: Release ${{ github.ref }}
-        body: Automated build of VIRUS38
+        files: artifacts/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
